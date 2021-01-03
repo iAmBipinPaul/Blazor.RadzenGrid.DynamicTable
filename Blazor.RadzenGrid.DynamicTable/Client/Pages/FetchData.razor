@@ -1,0 +1,41 @@
+﻿@page "/fetchdata"
+@using System.Dynamic;
+@inject HttpClient Http
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+@if (render)
+{
+    <RadzenGrid Data="forecasts" ColumnWidth="200px">
+        <Columns>
+            @foreach (var key in columns.Keys)
+            {
+                <RadzenGridColumn TItem="ExpandoObject" Property="@key" Title="@columns[key].ToString()">
+                    <Template Context="data">
+                        <span>@((data as IDictionary<string, object>)[key].ToString())</span>
+                    </Template>
+                </RadzenGridColumn>
+            }
+        </Columns>
+    </RadzenGrid>
+}
+
+@code {
+    bool render = false;
+    private List<ExpandoObject> forecasts;
+    string text = "Hi";
+    Dictionary<string, object> columns = new Dictionary<string, object>() {
+
+        {"date", "date" },
+        { "temperatureC", "temperatureC"},
+        {"summary", "summary" },
+        {"temperatureF", "temperatureF" }
+    };
+ 
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await Http.GetFromJsonAsync<List<ExpandoObject>>("WeatherForecast");
+        render = true;    
+    }
+}
